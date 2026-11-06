@@ -1,0 +1,78 @@
+rules_version = '2';
+
+// ===== Firebase Security Rules - Aplikasi Perpustakaan SMPN 1 Bandar Lampung =====
+// Hanya akun ADMIN (Firebase Authentication, email & sandi) yang boleh membaca/menulis.
+// Pengunjung tanpa login tidak bisa mengakses data apa pun.
+//
+// WAJIB: ganti daftar email di fungsi isAdmin() dengan email admin Anda.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.token.email in [
+               'admin@smpn1-bandarlampung.sch.id'
+             ];
+    }
+
+    function validAnggota() {
+      let d = request.resource.data;
+      return d.nis is string && d.nis.size() > 0 && d.nis.size() <= 30
+          && d.nama is string && d.nama.size() > 0
+          && d.kelas is string
+          && (!('nisn' in d) || d.nisn is string);
+    }
+
+    function validAnggotaGtk() {
+      let d = request.resource.data;
+      return d.noAnggota is string && d.noAnggota.size() > 0 && d.noAnggota.size() <= 30
+          && d.nama is string && d.nama.size() > 0
+          && d.jenisPtk in ['Guru', 'Tendik']
+          && d.jenisKelamin in ['L', 'P']
+          && (!('nip' in d) || d.nip is string);
+    }
+
+    function validBuku() {
+      let d = request.resource.data;
+      return d.kodeBuku is string && d.kodeBuku.size() > 0 && d.kodeBuku.size() <= 40
+          && d.judul is string && d.judul.size() > 0
+          && d.jumlahTotal is number && d.jumlahTotal >= 1
+          && d.jumlahTersedia is number && d.jumlahTersedia >= 0;
+    }
+
+    match /pengaturan/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /anggota/{nis} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() && validAnggota();
+      allow delete: if isAdmin();
+    }
+
+    match /anggota_gtk/{noAnggota} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() && validAnggotaGtk();
+      allow delete: if isAdmin();
+    }
+
+    match /buku/{kode} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() && validBuku();
+      allow delete: if isAdmin();
+    }
+
+    match /peminjaman/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /aktivitas/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // Selain koleksi di atas: ditolak.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

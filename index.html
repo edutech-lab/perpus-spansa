@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aplikasi Perpustakaan - SMP Negeri 1 Bandar Lampung</title>
+<meta name="theme-color" content="#0147ac">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Perpustakaan">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+</head>
+<body>
+<div id="lib-root">
+
+  <div id="lib-boot" class="boot"><div class="spin"></div><span id="lib-boot-t">Memuat aplikasi…</span></div>
+
+  <!-- LOGIN ADMIN -->
+  <div id="lib-login" class="login">
+    <form class="lcard" data-sub="login" autocomplete="on" novalidate>
+      <div class="lg">
+        <img data-logo alt="Logo sekolah">
+        <h1 data-t="app">Aplikasi Perpustakaan</h1>
+        <span data-t="sekolahTa">SMP Negeri 1 Bandar Lampung</span>
+      </div>
+      <div id="lib-lerr" class="lerr" role="alert"></div>
+      <div class="fld" style="margin-bottom:14px">
+        <label for="lg-email">Email admin</label>
+        <input id="lg-email" class="in" name="email" type="email" autocomplete="username" inputmode="email" required>
+      </div>
+      <div class="fld" style="margin-bottom:18px">
+        <label for="lg-pw">Kata sandi</label>
+        <div class="pw"><input id="lg-pw" class="in" name="pw" type="password" autocomplete="current-password" required><button type="button" data-act="togglePw">Tampilkan</button></div>
+      </div>
+      <button id="lg-btn" class="btn pri" type="submit" style="width:100%;height:46px">Masuk</button>
+      <div id="lib-lpv" class="lpv" style="display:none">Mode pratinjau: data contoh tersimpan sementara di browser. Isi email dan kata sandi apa saja untuk masuk.</div>
+    </form>
+  </div>
+
+  <!-- APLIKASI -->
+  <div id="lib-app">
+    <aside class="side">
+      <div class="brand">
+        <img data-logo alt="">
+        <div><b data-t="sekolahUp">SMP NEGERI 1 BANDAR LAMPUNG</b><i data-t="semboyan">Religious, Righteous, Victorious</i></div>
+      </div>
+      <nav class="nav" id="lib-nav" aria-label="Menu utama"></nav>
+    </aside>
+
+    <div class="main">
+      <header class="head">
+        <button class="hbtn" data-act="toggleSide" aria-label="Buka atau tutup menu"><span class="i" data-i="menu"></span></button>
+        <div class="htitle"><b data-t="app">Aplikasi Perpustakaan</b><span data-t="sekolah">SMP Negeri 1 Bandar Lampung</span></div>
+        <div class="hsearch">
+          <input id="lib-q" data-in="hq" type="search" placeholder="Cari buku, judul, pengarang…" autocomplete="off" aria-label="Cari buku">
+          <span class="si"><span class="i" data-i="search"></span></span>
+        </div>
+        <div class="user">
+          <button data-act="userMenu" aria-label="Menu admin"><span class="av"><span class="i" data-i="user"></span></span><span>Admin</span><span class="i" data-i="chev"></span></button>
+          <div class="umenu" id="lib-umenu">
+            <div class="em" id="lib-email">admin</div>
+            <button data-act="installApp" id="lib-install" style="display:none"><span class="i" data-i="download"></span>Pasang aplikasi</button>
+            <button data-act="logout"><span class="i" data-i="logout"></span>Keluar</button>
+          </div>
+        </div>
+      </header>
+      <main class="content" id="lib-view" tabindex="-1"></main>
+    </div>
+
+    <footer class="foot">
+      <div class="fl"><img data-logo alt=""><div><b data-t="sekolahUp">SMP NEGERI 1 BANDAR LAMPUNG</b><i data-t="semboyan">Religious, Righteous, Victorious</i></div></div>
+      <div class="fc"><span class="i" data-i="book" data-s="34"></span><div><b>Perpustakaan Digital</b><span>Membaca &bull; Belajar &bull; Berkembang</span></div></div>
+      <div class="fr"><span data-t="copy"></span><br>All rights reserved.</div>
+    </footer>
+
+    <nav class="bnav" id="lib-bnav" aria-label="Menu bawah"></nav>
+  </div>
+
+  <div id="lib-modal" class="ovl" role="dialog" aria-modal="true"><div class="mdl" id="lib-mdl"></div></div>
+  <div id="lib-prog" class="pg" role="status" aria-live="polite"><div class="pgc"><div class="spin"></div><b id="lib-prog-t">Memproses…</b><span id="lib-prog-s"></span><div class="pgb ind" id="lib-prog-bar"><i id="lib-prog-i"></i></div><em id="lib-prog-p"></em></div></div>
+  <div id="lib-topbar"><i></i></div>
+  <div id="lib-toast" aria-live="polite"></div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
