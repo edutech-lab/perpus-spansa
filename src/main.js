@@ -693,7 +693,7 @@ SUB.bukuSave = async f => {
   const act = activeOfBook(kode).length;
   if (!err && edit && jumlah < act) err = 'Jumlah tidak boleh kurang dari buku yang sedang dipinjam (' + act + ').';
   if (err) { toast(err, 'err'); return; }
-  const d = { kodeBuku: kode, judul, pengarang: txt(fd.get('pengarang')), klasifikasi: txt(fd.get('klasifikasi')), penerbit: txt(fd.get('penerbit')), tahun: txt(fd.get('tahun')), kategori: txt(fd.get('kategori')) || 'Lainnya', rak: txt(fd.get('rak')), jumlahTotal: jumlah, jumlahTersedia: jumlah - act };
+  const d = { kodeBuku: kode, judul, pengarang: txt(fd.get('pengarang')), klasifikasi: txt(fd.get('klasifikasi')), penerbit: txt(fd.get('penerbit')), tahun: txt(fd.get('tahun')), kategori: txt(fd.get('kategori')) || 'Lainnya', rak: txt(fd.get('rak')), jumlahTotal: jumlah, jumlahTersedia: Math.max(0, jumlah - act) };
   const ops = [];
   if (edit) { const old = findBuku(kode); if (!old) { toast('Data buku tidak ditemukan.', 'err'); return; } ops.push({ t: 'upd', c: 'buku', id: old.id, d }); }
   else { d.dibuatPada = Date.now(); ops.push({ t: 'set', c: 'buku', id: kode, d }); ops.push(actOp('buku', judul, 'Kode ' + kode)); }
@@ -1074,7 +1074,7 @@ async function doReturn(p) {
   if (!cur0 || cur0.status !== 'dipinjam') throw new Error('Peminjaman ini sudah dikembalikan.');
   const t = today(), late = Math.max(0, diffDays(p.jatuhTempo, t)), denda = late * (Number(S.set.dendaPerHari) || 0), b = findBuku(p.kodeBuku);
   const ops = [{ t: 'upd', c: 'peminjaman', id: p.id, d: { status: 'kembali', tglKembali: t, tsKembali: Date.now(), denda, terlambat: late } }];
-  if (b) ops.push({ t: 'upd', c: 'buku', id: b.id, d: { jumlahTersedia: Math.min(Number(b.jumlahTotal) || 0, (Number(b.jumlahTotal) || 0) - activeOfBook(b.kodeBuku).length + 1) } });
+  if (b) ops.push({ t: 'upd', c: 'buku', id: b.id, d: { jumlahTersedia: Math.max(0, Math.min(Number(b.jumlahTotal) || 0, (Number(b.jumlahTotal) || 0) - activeOfBook(b.kodeBuku).length + 1)) } });
   ops.push(actOp('kembali', p.namaSiswa, p.judulBuku));
   await commit(ops);
   Rt.last.unshift({ nama: p.namaSiswa, kelas: p.kelas, judul: p.judulBuku, late, denda, ts: Date.now() });
@@ -1350,7 +1350,7 @@ ACT.impGo = async t => {
         if (!upd) { skip++; continue; }
         const dipinjam = activeOfBook(ex.kodeBuku).length;
         if (x.d.jumlahTotal < dipinjam) { skip++; continue; }
-        ada++; ops.push({ t: 'set', c: 'buku', id: ex.id, merge: true, d: Object.assign({}, x.d, { jumlahTersedia: x.d.jumlahTotal - dipinjam }) });
+        ada++; ops.push({ t: 'set', c: 'buku', id: ex.id, merge: true, d: Object.assign({}, x.d, { jumlahTersedia: Math.max(0, x.d.jumlahTotal - dipinjam) }) });
       } else { baru++; ops.push({ t: 'set', c: 'buku', id: x.d.kodeBuku, merge: true, d: Object.assign({}, x.d, { jumlahTersedia: x.d.jumlahTotal, dibuatPada: now }) }); }
     }
   }
