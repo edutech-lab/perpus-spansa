@@ -881,7 +881,7 @@ SUB.kartuPrint = async f => {
   if (!list.length) { toast('Tidak ada anggota untuk dicetak.', 'err'); return; }
   if (list.length > 1000) { toast('Maksimal 1.000 kartu sekali cetak. Cetak per kelas.', 'err'); return; }
   const logo = S.set.logoUrl || LOGO;
-  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><img src="${esc(logo)}" alt=""><div><b>${esc(S.set.namaSekolah)}</b><span>KARTU PERPUSTAKAAN</span></div></div><div class="kn"><b>${esc(a.nama)}</b><span>Kelas ${esc(a.kelas)} \u2022 NIS ${esc(a.nis)}</span></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="40" data-fs="12"></svg></div><div class="ks"></div></div>`).join('')}</div>`;
+  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><img src="${esc(logo)}" alt=""><div><b>${esc(S.set.namaSekolah)}</b><span>KARTU PERPUSTAKAAN</span></div></div><div class="kn"><b>${esc(a.nama)}</b><span>NIS ${esc(a.nis)}</span><span>Kelas ${esc(a.kelas)}</span></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="40" data-fs="12"></svg></div><div class="ks"></div></div>`).join('')}</div>`;
   closeModal();
   await doPrint(html, 'Kartu perpustakaan ' + fmtNum(list.length) + ' kartu');
 };
@@ -902,16 +902,16 @@ const PRINT_CSS = `*{box-sizing:border-box;-webkit-print-color-adjust:exact;prin
 .stk .rk{display:flex;align-items:center;justify-content:center;margin-top:.3mm;padding:.5mm 1.6mm;background:#000;color:#fff;border-radius:.8mm}
 .stk .rk b{font-size:9pt;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .kt-grid{display:grid;grid-template-columns:repeat(2,85.6mm);gap:3mm 5mm;justify-content:center}
-.kt{width:85.6mm;height:54mm;border-radius:3mm;overflow:hidden;position:relative;color:#fff;background:linear-gradient(135deg,#0147ac 0%,#001455 100%);break-inside:avoid;page-break-inside:avoid;font-family:Arial,Helvetica,sans-serif}
+.kt{display:flex;flex-direction:column;width:85.6mm;height:54mm;border-radius:3mm;overflow:hidden;position:relative;color:#fff;background:linear-gradient(135deg,#0147ac 0%,#001455 100%);break-inside:avoid;page-break-inside:avoid;font-family:Arial,Helvetica,sans-serif}
 .kt .kh{display:flex;align-items:center;gap:2.5mm;padding:3mm 4mm 0}
 .kt .kh img{width:10mm;height:10mm;object-fit:contain}
 .kt .kh b{display:block;font-size:7.5pt;line-height:1.1}
 .kt .kh span{display:block;font-size:6pt;letter-spacing:.08em;color:#fed403;font-weight:700;margin-top:.6mm}
 .kt .kn{padding:2.2mm 4mm 0}
 .kt .kn b{display:block;font-size:10.5pt;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kt .kn span{font-size:7pt;opacity:.92}
-.kt .kb{position:absolute;left:4mm;right:4mm;bottom:3mm;background:#fff;border-radius:1.8mm;padding:1.2mm 2mm;height:17mm;display:flex;align-items:center;justify-content:center}
-.kt .kb svg{height:100%;width:auto;max-width:100%}
+.kt .kn span{display:block;font-size:7.5pt;line-height:1.4;opacity:.95}
+.kt .kb{flex:1;min-height:0;margin:2.4mm 4mm 3.8mm;background:#fff;border-radius:1.8mm;padding:1.4mm 2mm;display:flex;align-items:center;justify-content:center}
+.kt .kb svg{height:100%;width:auto;max-width:100%;max-height:100%}
 .kt .ks{position:absolute;left:0;right:0;bottom:0;height:1.6mm;background:linear-gradient(90deg,#fed403,#ffb305)}
 .rp{font:10pt Arial,Helvetica,sans-serif;color:#000}
 .rp h2{font-size:14pt;margin:0 0 2px}.rp p{margin:0 0 8px;color:#444;font-size:9pt}

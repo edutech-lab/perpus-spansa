@@ -141,7 +141,7 @@ export function setupGtk(c) {
     if (!list.length) { toast('Tidak ada anggota untuk dicetak.', 'err'); return; }
     if (list.length > 1000) { toast('Maksimal 1.000 kartu sekali cetak. Cetak per jenis PTK.', 'err'); return; }
     const logo = S.set.logoUrl || LOGO;
-    const html = `<div class="kt-grid">${list.map(g => `<div class="kt"><div class="kh"><img src="${esc(logo)}" alt=""><div><b>${esc(S.set.namaSekolah)}</b><span>KARTU PERPUSTAKAAN GTK</span></div></div><div class="kn"><b>${esc(g.nama)}</b><span>${esc(g.jenisPtk)} \u2022 No. ${esc(g.noAnggota)}</span></div><div class="kb"><svg data-bc="${esc(g.noAnggota)}" data-h="40" data-fs="12"></svg></div><div class="ks"></div></div>`).join('')}</div>`;
+    const html = `<div class="kt-grid">${list.map(g => `<div class="kt"><div class="kh"><img src="${esc(logo)}" alt=""><div><b>${esc(S.set.namaSekolah)}</b><span>KARTU PERPUSTAKAAN GTK</span></div></div><div class="kn"><b>${esc(g.nama)}</b><span>No. Anggota ${esc(g.noAnggota)}</span><span>${esc(g.jenisPtk)}</span></div><div class="kb"><svg data-bc="${esc(g.noAnggota)}" data-h="40" data-fs="12"></svg></div><div class="ks"></div></div>`).join('')}</div>`;
     closeModal();
     await doPrint(html, 'Kartu perpustakaan GTK ' + fmtNum(list.length) + ' kartu');
   };
