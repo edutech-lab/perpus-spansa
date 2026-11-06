@@ -214,6 +214,14 @@ async function isEmpty(c) {
   const s = await fb.getDocs(fb.query(fb.collection(fdb, c), fb.limit(1)));
   return s.empty;
 }
+let deniedOn = false;
+function showDenied() {
+  if (deniedOn) return; deniedOn = true;
+  const d = document.createElement('div'); d.id = 'lib-deny'; d.setAttribute('role', 'alert');
+  d.innerHTML = `<b>Akses ditolak oleh Firestore Rules</b><p>Login berhasil, tetapi Firestore menolak pembacaan data untuk akun <b>${esc(S.user || '')}</b>.</p><p>Buka Firebase Console &gt; Firestore Database &gt; Rules. Pada fungsi <b>isAdmin()</b>, isi daftar email dengan email di atas (huruf harus sama persis), klik <b>Publish</b>, lalu muat ulang halaman ini.</p><div><button class="btn" data-act="denyClose">Tutup</button><button class="btn pri" data-act="logout">Keluar</button></div>`;
+  $('#lib-root').appendChild(d);
+}
+ACT.denyClose = () => { const d = $('#lib-deny'); if (d) d.remove(); };
 function watchAll() {
   const unsub = [], ps = [];
   const listen = (key, q, onData) => {
@@ -221,7 +229,7 @@ function watchAll() {
       let done = false;
       unsub.push(fb.onSnapshot(q, snap => { onData(snap); if (!done) { done = true; res(); } notify(); }, err => {
         console.error(err);
-        toast('Gagal memuat data ' + key + ': ' + (err.code || err.message), 'err', 6500);
+        if (err.code === 'permission-denied') showDenied(); else toast('Gagal memuat data ' + key + ': ' + (err.code || err.message), 'err', 6500);
         if (!done) { done = true; res(); }
       }));
     }));
@@ -1548,7 +1556,7 @@ async function startApp(email) {
   $('#lib-login').classList.remove('on');
   S.user = email; $('#lib-email').textContent = email || 'Admin';
   try { await autoSetupDatabase(); }
-  catch (e) { console.error(e); toast('Setup database gagal: ' + (e.code || e.message) + '. Periksa Security Rules dan akun admin.', 'err', 8000); }
+  catch (e) { console.error(e); if (e.code === 'permission-denied') showDenied(); else toast('Setup database gagal: ' + (e.code || e.message) + '. Periksa Security Rules dan akun admin.', 'err', 8000); }
   try { if (IS_PREVIEW) memSync(); else await watchAll(); }
   catch (e) { console.error(e); toast('Gagal memuat data: ' + (e.code || e.message), 'err', 6000); }
   rebuild(); applySettings();
@@ -1559,6 +1567,7 @@ async function startApp(email) {
   go(views[id] ? id : 'beranda');
 }
 function stopApp() {
+  deniedOn = false; ACT.denyClose();
   stopWatch(); appOn = false; starting = false;
   Object.assign(S, { anggota: [], gtk: [], buku: [], pinjam: [], akt: [], user: null });
   rebuild(); Pm.nis = null; Pm.items = []; Rt.last = [];
