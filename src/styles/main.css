@@ -13,18 +13,6 @@
 .spin{width:38px;height:38px;border-radius:50%;border:4px solid #dbe7fb;border-top-color:#0147ac;animation:lsp .8s linear infinite}
 @keyframes lsp{to{transform:rotate(360deg)}}
 /* ===== LOGIN ===== */
-.login{position:absolute;inset:0;z-index:80;display:none;place-items:center;padding:20px;background:radial-gradient(1200px 600px at 20% -10%,#1d6be0 0%,transparent 60%),linear-gradient(160deg,#0147ac 0%,#001455 100%);overflow:auto}
-.login.on{display:grid}
-.lcard{width:min(420px,100%);background:rgba(255,255,255,.96);border-radius:24px;padding:34px 30px 28px;box-shadow:0 30px 80px -20px rgba(0,10,60,.7)}
-.lcard .lg{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin-bottom:22px}
-.lcard .lg img{width:78px;height:78px;object-fit:contain}
-.lcard h1{font-size:21px;font-weight:800;color:#0b2a6f}
-.lcard .lg span{color:var(--mut);font-size:13px}
-.lcard .pw{position:relative}
-.lcard .pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:34px;padding:0 10px;border-radius:9px;color:#0147ac;font-weight:700;font-size:12px}
-.lerr{background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:14px;display:none}
-.lerr.on{display:block}
-.lpv{margin-top:16px;text-align:center;font-size:12px;color:var(--mut)}
 /* ===== KERANGKA APLIKASI ===== */
 #lib-app{position:absolute;inset:0;display:none;grid-template-columns:var(--side) minmax(0,1fr);grid-template-rows:minmax(0,1fr) var(--foot);grid-template-areas:"side main" "foot foot";transition:grid-template-columns .25s ease}
 #lib-app.on{display:grid}

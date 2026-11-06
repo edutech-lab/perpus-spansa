@@ -22,24 +22,43 @@
 
   <!-- LOGIN ADMIN -->
   <div id="lib-login" class="login">
-    <form class="lcard" data-sub="login" autocomplete="on" novalidate>
-      <div class="lg">
-        <img data-logo alt="Logo sekolah">
-        <h1 data-t="app">Aplikasi Perpustakaan</h1>
-        <span data-t="sekolahTa">SMP Negeri 1 Bandar Lampung</span>
+    <section class="lgx-brand">
+      <div class="lgx-top">
+        <span class="lgx-logo"><img data-logo alt="Logo sekolah"></span>
+        <div><b data-t="sekolahUp">SMP NEGERI 1 BANDAR LAMPUNG</b><i data-t="semboyan">Religious, Righteous, Victorious</i></div>
       </div>
-      <div id="lib-lerr" class="lerr" role="alert"></div>
-      <div class="fld" style="margin-bottom:14px">
-        <label for="lg-email">Email admin</label>
-        <input id="lg-email" class="in" name="email" type="email" autocomplete="username" inputmode="email" required>
+      <div class="lgx-hero">
+        <span class="lgx-chip">Perpustakaan Digital</span>
+        <h2 data-t="app">Aplikasi Perpustakaan</h2>
+        <p>Kelola katalog buku, anggota siswa dan GTK, peminjaman, serta pengembalian dalam satu aplikasi yang cepat dan rapi.</p>
+        <ul class="lgx-feat">
+          <li><span class="fi"><span class="i" data-i="scan" data-s="20"></span></span><div><b>Peminjaman lewat scan barcode</b><span>Kartu anggota dan stiker buku langsung terbaca.</span></div></li>
+          <li><span class="fi"><span class="i" data-i="users" data-s="20"></span></span><div><b>Anggota siswa dan GTK</b><span>Impor Excel dan cetak kartu anggota.</span></div></li>
+          <li><span class="fi"><span class="i" data-i="chart" data-s="20"></span></span><div><b>Laporan dan statistik</b><span>Pantau peminjaman, keterlambatan, dan buku terpopuler.</span></div></li>
+        </ul>
       </div>
-      <div class="fld" style="margin-bottom:18px">
-        <label for="lg-pw">Kata sandi</label>
-        <div class="pw"><input id="lg-pw" class="in" name="pw" type="password" autocomplete="current-password" required><button type="button" data-act="togglePw">Tampilkan</button></div>
-      </div>
-      <button id="lg-btn" class="btn pri" type="submit" style="width:100%;height:46px">Masuk</button>
-      <div id="lib-lpv" class="lpv" style="display:none">Mode pratinjau: data contoh tersimpan sementara di browser. Isi email dan kata sandi apa saja untuk masuk.</div>
-    </form>
+      <div class="lgx-bf"><span data-t="copy"></span></div>
+    </section>
+
+    <section class="lgx-side">
+      <form class="lgx-card" data-sub="login" autocomplete="on" novalidate>
+        <span class="lgx-badge" data-t="sekolahTa">SMP Negeri 1 Bandar Lampung</span>
+        <h1>Selamat datang</h1>
+        <p class="lgx-sub">Masuk dengan akun admin untuk mengelola perpustakaan.</p>
+        <div id="lib-lerr" class="lerr" role="alert"></div>
+        <div class="lgx-fld">
+          <label for="lg-email">Email admin</label>
+          <div class="lgx-in"><span class="i" data-i="mail" data-s="18"></span><input id="lg-email" class="in" name="email" type="email" autocomplete="username" inputmode="email" placeholder="nama@sekolah.sch.id" required></div>
+        </div>
+        <div class="lgx-fld">
+          <label for="lg-pw">Kata sandi</label>
+          <div class="lgx-in"><span class="i" data-i="lock" data-s="18"></span><input id="lg-pw" class="in" name="pw" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required><button type="button" class="lgx-eye" data-act="togglePw">Tampilkan</button></div>
+        </div>
+        <button id="lg-btn" class="btn pri lgx-btn" type="submit">Masuk</button>
+        <p class="lgx-note"><span class="i" data-i="lock" data-s="14"></span>Akses khusus administrator perpustakaan.</p>
+        <div id="lib-lpv" class="lpv" style="display:none">Mode pratinjau: data contoh tersimpan sementara di memori. Isi email dan kata sandi apa saja untuk masuk.</div>
+      </form>
+    </section>
   </div>
 
   <!-- APLIKASI -->

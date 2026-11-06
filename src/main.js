@@ -1,4 +1,5 @@
 import './styles/main.css';
+import './styles/login.css';
 import * as XLSX from 'xlsx';
 import JsBarcode from 'jsbarcode';
 import { Chart, registerables } from 'chart.js';
@@ -1604,7 +1605,7 @@ function bindEvents() {
 (async function boot() {
   document.documentElement.style.overflow = 'hidden';
   setupPWA(); hydrateIcons(); renderNav(); applySettings(); bindEvents();
-  const showLogin = () => { $('#lib-boot').classList.add('off'); $('#lib-login').classList.add('on'); };
+  const showLogin = () => { $('#lib-boot').classList.add('off'); $('#lib-login').classList.add('on'); setTimeout(() => { const e = $('#lg-email'); if (e) e.focus(); }, 150); };
   if (IS_PREVIEW) { $('#lib-lpv').style.display = ''; showLogin(); return; }
   if (!FIREBASE_READY) { showLogin(); loginErr('Konfigurasi Firebase belum lengkap. Isi Environment Variables VITE_FIREBASE_* lalu deploy ulang.'); return; }
   try {

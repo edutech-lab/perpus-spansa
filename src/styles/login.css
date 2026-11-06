@@ -1,0 +1,54 @@
+/* ===== Halaman login ===== */
+.login{position:absolute;inset:0;z-index:80;display:none;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);background:#f4f8ff;overflow:auto}
+.login.on{display:grid}
+.lerr{background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:16px;display:none}
+.lerr.on{display:block}
+.lpv{margin-top:16px;text-align:center;font-size:12px;color:var(--mut);line-height:1.5}
+
+.lgx-brand{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:40px 56px;color:#fff;overflow:hidden;
+  background:radial-gradient(700px 420px at 100% 0%,rgba(254,211,3,.18),transparent 60%),radial-gradient(900px 600px at -10% 110%,rgba(46,125,255,.55),transparent 60%),linear-gradient(155deg,#0147ac 0%,#001455 100%)}
+.lgx-brand::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:42px 42px;-webkit-mask-image:linear-gradient(180deg,#000,transparent 85%);mask-image:linear-gradient(180deg,#000,transparent 85%);pointer-events:none}
+.lgx-brand>*{position:relative}
+.lgx-top{display:flex;align-items:center;gap:14px}
+.lgx-logo{width:56px;height:56px;border-radius:16px;background:#fff;display:grid;place-items:center;flex:none;box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
+.lgx-logo img{width:40px;height:40px;object-fit:contain}
+.lgx-top b{display:block;font-size:14px;letter-spacing:.04em;line-height:1.2}
+.lgx-top i{display:block;font-style:normal;font-size:12px;opacity:.8;margin-top:3px}
+.lgx-hero{max-width:520px}
+.lgx-chip{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(254,211,3,.16);border:1px solid rgba(254,211,3,.45);color:#fed403;font-size:12px;font-weight:700;letter-spacing:.04em}
+.lgx-hero h2{font-size:clamp(28px,3.2vw,40px);line-height:1.15;font-weight:800;margin:16px 0 12px}
+.lgx-hero>p{font-size:15px;line-height:1.65;opacity:.88}
+.lgx-feat{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:16px}
+.lgx-feat li{display:flex;gap:14px;align-items:flex-start}
+.lgx-feat .fi{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fed403}
+.lgx-feat b{display:block;font-size:14px}
+.lgx-feat li span:not(.fi):not(.i){display:block;font-size:12.5px;opacity:.78;margin-top:2px;line-height:1.5}
+.lgx-bf{font-size:12px;opacity:.7}
+
+.lgx-side{display:grid;place-items:center;padding:32px 24px}
+.lgx-card{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:36px 32px 28px;box-shadow:0 30px 70px -30px rgba(1,40,120,.35)}
+.lgx-badge{display:inline-block;padding:5px 11px;border-radius:999px;background:#eef4ff;color:#0147ac;font-size:11.5px;font-weight:700;margin-bottom:14px}
+.lgx-card h1{font-size:26px;font-weight:800;color:#0b2a6f;line-height:1.2}
+.lgx-sub{color:var(--mut);font-size:13.5px;margin:6px 0 22px;line-height:1.55}
+.lgx-fld{margin-bottom:16px}
+.lgx-fld label{display:block;font-size:12.5px;font-weight:700;color:#1e3a8a;margin-bottom:6px}
+.lgx-in{position:relative}
+.lgx-in>.i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#7a8fb4;display:flex;pointer-events:none}
+.lgx-in .in{width:100%;height:48px;padding-left:44px;padding-right:96px;border-radius:12px;background:#f8fbff}
+.lgx-in .in:focus{background:#fff;border-color:#1a73ff;box-shadow:0 0 0 4px rgba(26,115,255,.15);outline:0}
+.lgx-in>.in:focus~.i{color:#0147ac}
+.lgx-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:36px;padding:0 12px;border-radius:9px;color:#0147ac;font-weight:700;font-size:12px}
+.lgx-eye:hover{background:#eef4ff}
+.lgx-btn{width:100%;height:50px;margin-top:6px;font-size:15px;border-radius:12px;box-shadow:0 14px 26px -14px rgba(1,71,172,.8)}
+.lgx-btn:disabled{opacity:.7;cursor:progress}
+.lgx-note{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:18px;font-size:12px;color:var(--mut)}
+.lgx-note .i{display:flex}
+
+@media (max-width:900px){
+  .login.on{display:block}
+  .lgx-brand{padding:28px 22px 78px;gap:0;border-radius:0 0 28px 28px}
+  .lgx-hero,.lgx-bf{display:none}
+  .lgx-side{padding:0 16px 28px;margin-top:-52px;position:relative}
+  .lgx-card{padding:28px 22px 22px}
+  .lgx-card h1{font-size:23px}
+}
