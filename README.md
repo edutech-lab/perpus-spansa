@@ -25,3 +25,9 @@ Koleksi Firestore baru: `anggota_gtk` (ID dokumen = No. Anggota) dengan field `n
 ## Catatan
 - Mode produksi tidak lagi mengisi data contoh ke Firestore; hanya dokumen `pengaturan/umum` yang dibuat otomatis jika kosong.
 - Service worker hanya menyimpan aset statis, bukan data Firestore.
+
+## Pembaruan 1.4.0
+- Tambah Anggota GTK: No. Anggota yang sudah ada langsung memunculkan notifikasi (sama seperti Kode Buku).
+- Cetak Laporan memakai kop surat sekolah (`src/kop.js`, ubah teks/logo di file tersebut bila perlu).
+- Pengaturan > Backup & Restore Data: unduh seluruh data ke file `.json` dan pulihkan dari file backup (mode Gabungkan atau Ganti semua).
+- Tinggi footer aplikasi dikecilkan menjadi 42 px.

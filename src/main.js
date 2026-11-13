@@ -6,6 +6,7 @@ import { Chart, registerables } from 'chart.js';
 import { IS_PREVIEW, FIREBASE_READY, firebaseConfig, LOGO, DEF_SET, TA_OPSI, taSaatIni } from './config.js';
 import { IC, ic } from './icons.js';
 import { setupGtk } from './gtk.js';
+import { kopHtml } from './kop.js';
 Chart.register(...registerables);
 
 /* ============ UTIL ============ */
@@ -957,6 +958,12 @@ const PRINT_CSS = `*{box-sizing:border-box;-webkit-print-color-adjust:exact;prin
 .kt .ks{position:absolute;left:0;right:0;bottom:0;height:1.8mm;background:linear-gradient(90deg,#fed403,#ffb305)}
 .rp{font:10pt Arial,Helvetica,sans-serif;color:#000}
 .rp h2{font-size:14pt;margin:0 0 2px}.rp p{margin:0 0 8px;color:#444;font-size:9pt}
+.kop-w{display:flex;align-items:center;justify-content:space-between;gap:3mm;font-family:Calibri,Carlito,Arial,Helvetica,sans-serif;color:#000}
+.kop-w img{flex:none;object-fit:contain}.kop-l{width:17mm;height:21.6mm}.kop-r{width:17.3mm;height:23.1mm}
+.kop-t{flex:1;min-width:0;text-align:center;line-height:1.15}
+.kop-1{font-size:14pt}.kop-2{font-size:18pt;font-weight:700}.kop-3{font-size:9pt}.kop-4{font-size:8.5pt;font-style:italic}
+.kop-line{margin:1.2mm 0 4mm;border-top:.9mm solid #000;padding-top:.5mm;border-bottom:.3mm solid #000}
+.rp .rp-head{text-align:center;margin-bottom:6px}.rp .rp-head h2{font-size:12pt;text-transform:uppercase}.rp .rp-head p{color:#000}
 .rp table{width:100%;border-collapse:collapse;font-size:8.5pt}
 .rp th,.rp td{border:.2mm solid #888;padding:3px 5px;text-align:left}
 .rp th{background:#e8eefc}`;
@@ -1459,7 +1466,7 @@ ACT.rptExport = () => xl('Mengekspor laporan', () => {
 });
 ACT.rptPrint = async () => {
   const d = reportData();
-  await doPrint(`<div class="rp"><h2>${esc(S.set.namaAplikasi)} - ${esc(S.set.namaSekolah)}</h2><p>${esc(d.title)} \u2022 Tahun Ajaran ${esc(taAktif())}</p><table><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${d.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`, d.title);
+  await doPrint(`<div class="rp">${kopHtml(esc)}<div class="rp-head"><h2>${esc(d.title)}</h2><p>Tahun Ajaran ${esc(taAktif())}</p></div><table><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${d.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`, d.title);
 };
 
 /* ============ PENGATURAN ============ */
@@ -1482,6 +1489,26 @@ views.pengaturan = {
  </div>
  <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn pri" type="submit">${ic('check', 18)}Simpan Pengaturan</button></div>
 </form>
+<div class="card pn" style="max-width:860px;margin-top:14px">
+ <div class="ph"><h3>${ic('download', 18)} Backup &amp; Restore Data</h3></div>
+ <p class="hint">Simpan salinan seluruh data aplikasi ke satu file, atau pulihkan data dari file backup sebelumnya. Lakukan backup secara berkala, terutama sebelum menghapus riwayat atau mengimpor data besar.</p>
+ <div class="bk-grid">
+  <div class="bk-box">
+   <div class="bk-ic bk-b">${ic('download', 22)}</div>
+   <b>Backup Data</b>
+   <p>Unduh seluruh data ke satu file .json: anggota siswa dan GTK, katalog buku, peminjaman, riwayat aktivitas, dan pengaturan.</p>
+   <button type="button" class="btn pri" data-act="bkDownload">${ic('download', 18)}Unduh Backup</button>
+  </div>
+  <div class="bk-box">
+   <div class="bk-ic bk-r">${ic('upload', 22)}</div>
+   <b>Restore Data</b>
+   <p>Pulihkan data dari file backup. Isi file diperiksa dulu dan Anda bisa memilih mode restore sebelum data diubah.</p>
+   <button type="button" class="btn warn" data-act="bkPick">${ic('upload', 18)}Pilih File Backup</button>
+   <input type="file" id="bk-file" accept=".json,application/json" data-ch="bkFile" hidden>
+  </div>
+ </div>
+ <div class="bk-note">${ic('info', 16)}<span>File backup berisi data pribadi anggota. Simpan di tempat yang aman dan jangan dibagikan.</span></div>
+</div>
 <div class="card pn" style="max-width:860px;margin-top:14px">
  <div class="ph"><h3>${ic('trash', 18)} Hapus Riwayat</h3></div>
  <p class="hint">Hapus riwayat untuk merapikan data. Peminjaman yang belum dikembalikan tidak pernah ikut terhapus. Peminjaman dan pengembalian tersimpan dalam satu catatan, jadi menghapus salah satunya juga menghapus catatan lengkapnya. Data yang dihapus tidak bisa dikembalikan, sebaiknya ekspor laporan xlsx lebih dulu.</p>
@@ -1509,6 +1536,108 @@ SUB.setSave = async f => {
     toast('Pengaturan berhasil disimpan.', 'ok');
   } catch (e) { toast('Gagal menyimpan: ' + (e.code || e.message || e), 'err', 5000); }
   btn.disabled = false;
+};
+/* ============ BACKUP & RESTORE ============ */
+const BK_FORMAT = 'perpus-backup';
+const BK_KOLEKSI = [['anggota', 'Anggota siswa'], ['anggota_gtk', 'Anggota GTK'], ['buku', 'Katalog buku'], ['peminjaman', 'Peminjaman dan pengembalian'], ['aktivitas', 'Riwayat aktivitas'], ['pengaturan', 'Pengaturan']];
+let RST = null;
+async function bkReadAll() {
+  const out = {};
+  for (const [c] of BK_KOLEKSI) {
+    if (IS_PREVIEW) out[c] = Array.from(mem[c].values()).map(r => Object.assign({}, r));
+    else { const sn = await fb.getDocs(fb.collection(fdb, c)); out[c] = sn.docs.map(d => Object.assign({ id: d.id }, d.data())); }
+  }
+  return out;
+}
+const bkStamp = () => { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()); };
+function bkSave(text, name) {
+  const u = URL.createObjectURL(new Blob([text], { type: 'application/json' })), a = document.createElement('a');
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 4000);
+}
+ACT.bkDownload = async () => {
+  try {
+    const data = await withProg('Membuat backup', 'Membaca seluruh data\u2026', () => bkReadAll());
+    const jumlah = {}; let total = 0;
+    BK_KOLEKSI.forEach(([c]) => { jumlah[c] = data[c].length; total += data[c].length; });
+    const pack = { format: BK_FORMAT, versi: 1, dibuat: new Date().toISOString(), aplikasi: S.set.namaAplikasi, sekolah: S.set.namaSekolah, jumlah, koleksi: data };
+    bkSave(JSON.stringify(pack), 'backup-perpustakaan_' + bkStamp() + '.json');
+    toast('Backup berhasil diunduh (' + fmtNum(total) + ' data).', 'ok', 4500);
+  } catch (e) { console.error(e); toast('Backup gagal: ' + (e.code || e.message || e), 'err', 6000); }
+};
+ACT.bkPick = () => { const i = $('#bk-file'); if (i) i.click(); };
+function bkValidate(p) {
+  if (!p || typeof p !== 'object' || p.format !== BK_FORMAT || !p.koleksi || typeof p.koleksi !== 'object') return { err: 'File ini bukan hasil Backup aplikasi Perpustakaan.' };
+  const rows = {}; let total = 0;
+  for (const [c] of BK_KOLEKSI) {
+    const arr = p.koleksi[c];
+    if (arr === undefined) { rows[c] = null; continue; }
+    if (!Array.isArray(arr)) return { err: 'Struktur data "' + c + '" pada file tidak valid.' };
+    const seen = new Set(), clean = [];
+    for (const r of arr) {
+      if (!r || typeof r !== 'object' || Array.isArray(r)) return { err: 'Ada data yang rusak pada "' + c + '".' };
+      const id = String(r.id == null ? '' : r.id);
+      if (!id || id.length > 200 || id.indexOf('/') >= 0 || id === '.' || id === '..' || /^__.*__$/.test(id)) return { err: 'Ada data dengan ID tidak valid pada "' + c + '".' };
+      if (c === 'pengaturan' && id !== 'umum') continue;
+      if (seen.has(id)) return { err: 'ID ganda "' + id + '" pada "' + c + '".' };
+      seen.add(id);
+      const d = {};
+      for (const k in r) { if (k === 'id' || /^__.*__$/.test(k) || isInc(r[k])) continue; d[k] = r[k]; }
+      clean.push({ id, d });
+    }
+    rows[c] = clean; total += clean.length;
+  }
+  if (!total) return { err: 'File backup tidak berisi data.' };
+  return { rows, total };
+}
+CHG.bkFile = async t => {
+  const f = t.files && t.files[0]; t.value = '';
+  if (!f) return;
+  if (f.size > 60 * 1024 * 1024) { toast('Ukuran file terlalu besar (maksimal 60 MB).', 'err'); return; }
+  let pack;
+  try { pack = JSON.parse(await f.text()); } catch (e) { toast('File tidak bisa dibaca. Pilih file backup berformat .json.', 'err', 5000); return; }
+  const v = bkValidate(pack);
+  if (v.err) { toast(v.err, 'err', 6000); return; }
+  RST = { rows: v.rows, total: v.total, name: f.name, dibuat: pack.dibuat, sekolah: pack.sekolah };
+  let tgl = '-'; try { if (pack.dibuat) tgl = new Date(pack.dibuat).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }); } catch (e) { /* abaikan */ }
+  openModal(`${mHead('Restore Data')}
+<form data-sub="bkRun" style="display:contents"><div class="mb">
+ <div class="bk-file">${ic('file', 22)}<div><b>${esc(f.name)}</b><span>Dibuat ${esc(tgl)}${pack.sekolah ? ' \u2022 ' + esc(pack.sekolah) : ''}</span></div></div>
+ <table class="bk-tbl"><tbody>${BK_KOLEKSI.map(([c, l]) => `<tr><td>${esc(l)}</td><td>${RST.rows[c] ? fmtNum(RST.rows[c].length) + ' data' : '<span class="sub">tidak ada di file</span>'}</td></tr>`).join('')}</tbody></table>
+ <div class="fld" style="margin-top:14px"><label>Mode restore</label>
+  <label class="chk"><input type="radio" name="mode" value="gabung" checked> Gabungkan: data dengan ID sama ditimpa, data lain tetap ada</label>
+  <label class="chk"><input type="radio" name="mode" value="ganti"> Ganti semua: data yang tidak ada di file backup dihapus</label>
+ </div>
+ <div class="bk-warn">${ic('alert', 18)}<span>Data yang ditimpa atau dihapus tidak bisa dikembalikan. Disarankan mengunduh backup terbaru dulu sebelum restore.</span></div>
+ <label class="chk" style="margin-top:12px"><input type="checkbox" name="ok" required> Saya mengerti dan ingin melanjutkan restore</label>
+</div>
+<div class="mf"><button type="button" class="btn" data-act="closeModal">Batal</button><button class="btn dng" type="submit">${ic('upload', 18)}Restore Sekarang</button></div></form>`);
+};
+SUB.bkRun = async f => {
+  const fd = new FormData(f), mode = fd.get('mode') === 'ganti' ? 'ganti' : 'gabung';
+  if (!RST || !fd.get('ok')) return;
+  const btn = $('button[type=submit]', f); btn.disabled = true;
+  try {
+    let n = 0;
+    await withProg('Restore data', 'Menyiapkan data\u2026', async p => {
+      const ops = []; let cur = null;
+      if (mode === 'ganti') { p.set(3, 'Membaca data saat ini\u2026'); cur = await bkReadAll(); }
+      for (const [c] of BK_KOLEKSI) {
+        const list = RST.rows[c]; if (!list) continue;
+        list.forEach(r => ops.push({ t: 'set', c, id: r.id, d: r.d }));
+        if (mode === 'ganti' && c !== 'pengaturan') {
+          const keep = new Set(list.map(r => r.id));
+          cur[c].forEach(r => { if (!keep.has(String(r.id))) ops.push({ t: 'del', c, id: String(r.id) }); });
+        }
+      }
+      n = ops.length;
+      await commit(ops, (d, t) => p.set(5 + d / t * 95, 'Menulis ' + fmtNum(d) + ' dari ' + fmtNum(t) + ' data'));
+    });
+    const total = RST.total; RST = null;
+    closeModal();
+    toast('Restore selesai: ' + fmtNum(total) + ' data dipulihkan' + (mode === 'ganti' ? ' (mode ganti semua).' : '.'), 'ok', 5500);
+    if (cur === 'pengaturan') setTimeout(() => go('pengaturan', true), 400);
+  } catch (e) { console.error(e); btn.disabled = false; toast('Restore gagal: ' + (e.code || e.message || e) + '. Sebagian data mungkin sudah tertulis; ulangi restore dengan file yang sama.', 'err', 8000); }
 };
 const HIST = { aktivitas: ['riwayat aktivitas', 'aktivitas'], peminjaman: ['riwayat peminjaman', 'peminjaman'], pengembalian: ['riwayat pengembalian', 'pengembalian'] };
 const PER_LBL = { m0: 'bulan ini', m3: '3 bulan terakhir', m6: '6 bulan terakhir' };
@@ -1640,7 +1769,7 @@ function setupPWA() {
 }
 
 /* ============ ANGGOTA GTK ============ */
-setupGtk({ namaKartu, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal, confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom, blankText, saveWb, stamp });
+setupGtk({ ENT, namaKartu, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal, confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom, blankText, saveWb, stamp });
 
 /* ============ EVENT & BOOT ============ */
 function bindEvents() {

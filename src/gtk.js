@@ -4,7 +4,7 @@
 import * as XLSX from 'xlsx';
 
 export function setupGtk(c) {
-  const { namaKartu, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal,
+  const { ENT, namaKartu, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal,
     confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom,
     blankText, saveWb, stamp } = c;
   const JENIS = ['Guru', 'Tendik'];
@@ -73,7 +73,7 @@ export function setupGtk(c) {
     openModal(`${mHead(edit ? 'Ubah Anggota GTK' : 'Tambah Anggota GTK')}
 <form data-sub="gtkSave" data-edit="${edit ? 1 : 0}" autocomplete="off" style="display:contents">
 <div class="mb"><div class="grid2">
- <div class="fld"><label>No. Anggota (isi barcode kartu)*</label><input class="in" name="no" value="${esc(g.noAnggota || '')}" ${edit ? 'readonly' : ''} required maxlength="30" placeholder="contoh: G001"></div>
+ <div class="fld"><label>No. Anggota (isi barcode kartu)*</label><input class="in" name="no" value="${esc(g.noAnggota || '')}" ${edit ? 'readonly' : 'data-enter="gtkNo" data-ch="gtkNo" autocapitalize="off" spellcheck="false"'} required maxlength="30" placeholder="contoh: G001"></div>
  <div class="fld"><label>NIP</label><input class="in" name="nip" value="${esc(g.nip || '')}" maxlength="20" inputmode="numeric"><small>Boleh dikosongkan bila belum punya NIP. Disimpan sebagai teks.</small></div>
  <div class="fld full"><label>Nama lengkap*</label><input class="in" name="nama" value="${esc(g.nama || '')}" required maxlength="120"></div>
  <div class="fld"><label>Jenis PTK*</label><select class="in" name="jenis" style="width:100%">${JENIS.map(j => `<option value="${j}" ${g.jenisPtk === j ? 'selected' : ''}>${j}</option>`).join('')}</select></div>
@@ -82,6 +82,20 @@ export function setupGtk(c) {
 </div></div>
 <div class="mf"><button type="button" class="btn" data-act="closeModal">Batal</button><button class="btn pri" type="submit">${ic('check', 18)}Simpan</button></div></form>`);
   }
+  /* Cek No. Anggota saat Tambah GTK (sama seperti kode buku): sudah ada -> notifikasi singkat, belum ada -> fokus ke Nama */
+  function cekNoGtk(inp, pindah) {
+    if (!inp) return;
+    const no = txt(inp.value);
+    if (!no) return;
+    if (!pindah && inp.dataset.chk === norm(no)) return;
+    inp.dataset.chk = norm(no);
+    const err = validKode(no).replace('Kode', 'No. Anggota');
+    if (err) { toast(err, 'warn', 2500); return; }
+    if (S.aMap.has(norm(no))) { toast('No. Anggota "' + no + '" sudah ada.', 'warn', 2500); inp.focus(); inp.select(); return; }
+    if (pindah) { const n = inp.form && inp.form.querySelector('input[name=nama]'); if (n) n.focus(); }
+  }
+  ENT.gtkNo = t => cekNoGtk(t, true);
+  CHG.gtkNo = t => cekNoGtk(t, false);
   ACT.gtkAdd = () => gtkForm();
   ACT.gtkEdit = t => { const g = S.gtk.find(x => x.id === t.dataset.id); if (g) gtkForm(g); };
   SUB.gtkSave = async f => {
