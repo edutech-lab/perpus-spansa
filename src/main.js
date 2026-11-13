@@ -866,7 +866,7 @@ function kartuModal(ids) {
   openModal(`${mHead('Cetak Kartu Perpustakaan')}
 <form data-sub="kartuPrint" style="display:contents"><div class="mb">
  <div class="fld"><label>Anggota yang dicetak</label>${opts.map((o, i) => `<label class="chk"><input type="radio" name="src" value="${o[0]}" ${i === 0 ? 'checked' : ''}> ${o[1]} (${fmtNum(o[2])})</label>`).join('')}</div>
- <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm (sama dengan kartu pelajar), 10 kartu per lembar A4. Tersedia kotak putih 2 x 3 cm (20 x 30 mm) di sisi kiri untuk menempel pas foto. Kartu menampilkan NISN, nama, dan kelas; barcode berisi NIS (tanpa angka di bawahnya). Pada kotak cetak browser aktifkan "Grafik latar belakang", skala 100%, dan matikan "Header dan footer".</p>
+ <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm (sama dengan kartu pelajar), 10 kartu per lembar A4. Tersedia kotak putih 2 x 3 cm (20 x 30 mm) di sisi kiri untuk menempel pas foto. Kartu menampilkan NISN, nama, dan kelas (urut dari atas); barcode berisi NIS (tanpa angka di bawahnya). Pada kotak cetak browser aktifkan "Grafik latar belakang", skala 100%, dan matikan "Header dan footer".</p>
 </div>
 <div class="mf"><button type="button" class="btn" data-act="closeModal">Batal</button><button class="btn warn" type="submit">${ic('print', 18)}Cetak Kartu</button></div></form>`);
 }
@@ -881,7 +881,7 @@ SUB.kartuPrint = async f => {
   if (!list.length) { toast('Tidak ada anggota untuk dicetak.', 'err'); return; }
   if (list.length > 1000) { toast('Maksimal 1.000 kartu sekali cetak. Cetak per kelas.', 'err'); return; }
   const logo = S.set.logoUrl || LOGO;
-  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(S.set.tahunAjaran)}</div></div><div class="kd"><div class="kf"><small>Nama</small><b class="kname">${esc(a.nama)}</b></div><div class="kr"><div class="kf"><small>NISN</small><b>${esc(a.nisn || '-')}</b></div><div class="kf"><small>Kelas</small><b>${esc(a.kelas)}</b></div></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
+  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(S.set.tahunAjaran)}</div></div><div class="kd"><div class="kf kv"><small>NISN</small><b>${esc(a.nisn || '-')}</b></div><div class="kn"><b class="kname">${esc(a.nama)}</b></div><div class="kf kv"><small>Kelas</small><b>${esc(a.kelas)}</b></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
   closeModal();
   await doPrint(html, 'Kartu perpustakaan ' + fmtNum(list.length) + ' kartu');
 };
@@ -915,13 +915,13 @@ const PRINT_CSS = `*{box-sizing:border-box;-webkit-print-color-adjust:exact;prin
 .kt .kp{width:20mm;height:30mm;flex:none;background:#fff;border-radius:.7mm;box-shadow:0 0 0 .35mm #fed403;display:flex;align-items:center;justify-content:center;text-align:center;color:#b3bccd;font:700 5pt/1.5 Arial,Helvetica,sans-serif;letter-spacing:.08em}
 .kt .kp i{font-style:normal}
 .kt .kta{margin-top:1.5mm;font-size:5.2pt;font-weight:700;letter-spacing:.08em;color:#fed403;white-space:nowrap}
-.kt .kd{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:1.5mm;height:30mm}
-.kt .kf small{display:block;font-size:4.8pt;letter-spacing:.14em;text-transform:uppercase;color:#fed403;font-weight:700;line-height:1;margin-bottom:.7mm}
-.kt .kf b{display:block;font-size:8.8pt;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kt .kf b.kname{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:8.6pt;text-transform:uppercase;letter-spacing:.01em}
-.kt .kr{display:flex;gap:4mm;padding-top:1.4mm;border-top:.25mm solid rgba(255,255,255,.28)}
-.kt .kr .kf{min-width:0}
-.kt .kb{height:10.2mm;flex:none;margin-top:auto;background:#fff;border-radius:1.4mm;padding:1mm 2mm;display:flex;align-items:center;justify-content:center}
+.kt .kd{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:1mm;height:30mm}
+.kt .kv{display:flex;align-items:baseline;gap:1.5mm;min-width:0}
+.kt .kv small{flex:none;width:11.5mm;font-size:5pt;letter-spacing:.1em;text-transform:uppercase;color:#fed403;font-weight:700;line-height:1}
+.kt .kv b{display:block;min-width:0;font-size:8.6pt;line-height:1.15;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt .kn{padding:.9mm 0;border-top:.25mm solid rgba(255,255,255,.3);border-bottom:.25mm solid rgba(255,255,255,.3)}
+.kt .kn b.kname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:9.2pt;line-height:1.18;font-weight:700}
+.kt .kb{height:10mm;flex:none;margin-top:auto;background:#fff;border-radius:1.4mm;padding:1mm 2mm;display:flex;align-items:center;justify-content:center}
 .kt .kb svg{height:100%;width:auto;max-width:100%;max-height:100%}
 .kt .ks{position:absolute;left:0;right:0;bottom:0;height:1.8mm;background:linear-gradient(90deg,#fed403,#ffb305)}
 .rp{font:10pt Arial,Helvetica,sans-serif;color:#000}
