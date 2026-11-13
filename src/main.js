@@ -3,7 +3,7 @@ import './styles/login.css';
 import * as XLSX from 'xlsx';
 import JsBarcode from 'jsbarcode';
 import { Chart, registerables } from 'chart.js';
-import { IS_PREVIEW, FIREBASE_READY, firebaseConfig, LOGO, DEF_SET } from './config.js';
+import { IS_PREVIEW, FIREBASE_READY, firebaseConfig, LOGO, DEF_SET, TA_OPSI, taSaatIni } from './config.js';
 import { IC, ic } from './icons.js';
 import { setupGtk } from './gtk.js';
 Chart.register(...registerables);
@@ -115,7 +115,37 @@ function stopScanner() {
 }
 
 /* ============ STATE & CACHE ============ */
-const S = { set: { ...DEF_SET }, anggota: [], gtk: [], gtkV: [], buku: [], pinjam: [], akt: [], aMap: new Map(), bMap: new Map(), actN: new Map(), actB: new Map(), user: null };
+const S = { set: { ...DEF_SET }, anggota: [], gtk: [], gtkV: [], buku: [], pinjam: [], akt: [], aMap: new Map(), bMap: new Map(), actN: new Map(), actB: new Map(), user: null, ta: null };
+/* Tahun ajaran aktif = pilihan di halaman login. Cadangan: nilai pada Pengaturan, lalu tahun ajaran saat ini. */
+const taAktif = () => S.ta || S.set.tahunAjaran || taSaatIni();
+
+/* Nama pada kartu selalu 1 baris. Jika terlalu panjang, kata setelah kata pertama disingkat menjadi inisial,
+   dimulai dari kata paling belakang. Contoh: Muhammad Rizky Pratama Putra -> Muhammad Rizky Pratama P. */
+const KT_NAMA_MM = 39.5, KT_NAMA_PT = 9;
+let ktCtx = null;
+function namaKartu(nama) {
+  const full = String(nama == null ? '' : nama).replace(/\s+/g, ' ').trim();
+  if (!full) return '-';
+  if (!ktCtx) ktCtx = document.createElement('canvas').getContext('2d');
+  const px = KT_NAMA_PT * 96 / 72, maxW = KT_NAMA_MM * 96 / 25.4 * 0.96;
+  ktCtx.font = '700 ' + px + 'px Arial, Helvetica, sans-serif';
+  const w = t => ktCtx.measureText(t).width + t.length * px * 0.01;
+  const ini = k => { const c = Array.from(k.replace(/^[^A-Za-z0-9\u00C0-\u024F]+/, ''))[0] || Array.from(k)[0]; return c.toUpperCase() + '.'; };
+  if (w(full) <= maxW) return full;
+  const k = full.split(' ');
+  for (let i = k.length - 1; i >= 1; i--) {
+    k[i] = ini(k[i]);
+    const t = k.join(' ');
+    if (w(t) <= maxW) return t;
+  }
+  if (k.length > 1) {
+    const d = full.split(' ');
+    const t2 = d.map((x, i) => i < d.length - 1 ? ini(x) : x).join(' ');
+    if (w(t2) <= maxW) return t2;
+    return d.map(ini).join(' ');
+  }
+  return full;
+}
 const views = {};
 const ACT = {}, INP = {}, CHG = {}, ENT = {}, SUB = {};
 const Q = { k: { q: '', kat: '', stok: '', page: 1 }, a: { q: '', kelas: '', page: 1 }, g: { q: '', jenis: '', page: 1 } };
@@ -332,7 +362,7 @@ function applySettings() {
   document.title = s.namaAplikasi + ' - ' + s.namaSekolah;
   const map = {
     app: s.namaAplikasi, sekolah: s.namaSekolah, sekolahUp: String(s.namaSekolah).toUpperCase(), semboyan: s.semboyan,
-    sekolahTa: s.namaSekolah + ' \u2022 TA ' + s.tahunAjaran, copy: '\u00A9 ' + new Date().getFullYear() + ' ' + s.namaAplikasi + ' ' + s.namaSekolah
+    sekolahTa: s.namaSekolah + ' \u2022 TA ' + taAktif(), copy: '\u00A9 ' + new Date().getFullYear() + ' ' + s.namaAplikasi + ' ' + s.namaSekolah
   };
   $$('[data-t]').forEach(el => { const v = map[el.dataset.t]; if (v != null && el.textContent !== v) el.textContent = v; });
   $$('img[data-logo]').forEach(i => {
@@ -866,7 +896,7 @@ function kartuModal(ids) {
   openModal(`${mHead('Cetak Kartu Perpustakaan')}
 <form data-sub="kartuPrint" style="display:contents"><div class="mb">
  <div class="fld"><label>Anggota yang dicetak</label>${opts.map((o, i) => `<label class="chk"><input type="radio" name="src" value="${o[0]}" ${i === 0 ? 'checked' : ''}> ${o[1]} (${fmtNum(o[2])})</label>`).join('')}</div>
- <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm (sama dengan kartu pelajar), 10 kartu per lembar A4. Tersedia kotak putih 2 x 3 cm (20 x 30 mm) di sisi kiri untuk menempel pas foto. Kartu menampilkan NISN, nama, dan kelas (urut dari atas); barcode berisi NIS (tanpa angka di bawahnya). Pada kotak cetak browser aktifkan "Grafik latar belakang", skala 100%, dan matikan "Header dan footer".</p>
+ <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm (sama dengan kartu pelajar), 10 kartu per lembar A4. Tersedia kotak putih 2 x 3 cm (20 x 30 mm) di sisi kiri untuk menempel pas foto. Kartu menampilkan NISN, Nama, dan Kelas dengan label di depan datanya (urut dari atas). Nama selalu 1 baris; jika terlalu panjang, nama belakang disingkat menjadi inisial. Barcode berisi NIS (tanpa angka di bawahnya). Pada kotak cetak browser aktifkan "Grafik latar belakang", skala 100%, dan matikan "Header dan footer".</p>
 </div>
 <div class="mf"><button type="button" class="btn" data-act="closeModal">Batal</button><button class="btn warn" type="submit">${ic('print', 18)}Cetak Kartu</button></div></form>`);
 }
@@ -881,7 +911,7 @@ SUB.kartuPrint = async f => {
   if (!list.length) { toast('Tidak ada anggota untuk dicetak.', 'err'); return; }
   if (list.length > 1000) { toast('Maksimal 1.000 kartu sekali cetak. Cetak per kelas.', 'err'); return; }
   const logo = S.set.logoUrl || LOGO;
-  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(S.set.tahunAjaran)}</div></div><div class="kd"><div class="kf kv"><small>NISN</small><b>${esc(a.nisn || '-')}</b></div><div class="kn"><b class="kname">${esc(a.nama)}</b></div><div class="kf kv"><small>Kelas</small><b>${esc(a.kelas)}</b></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
+  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(taAktif())}</div></div><div class="kd"><div class="kf kv"><small>NISN</small><em>:</em><b>${esc(a.nisn || '-')}</b></div><div class="kn kv"><small>Nama</small><em>:</em><b class="kname">${esc(namaKartu(a.nama))}</b></div><div class="kf kv"><small>Kelas</small><em>:</em><b>${esc(a.kelas)}</b></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
   closeModal();
   await doPrint(html, 'Kartu perpustakaan ' + fmtNum(list.length) + ' kartu');
 };
@@ -914,13 +944,14 @@ const PRINT_CSS = `*{box-sizing:border-box;-webkit-print-color-adjust:exact;prin
 .kt .kfw{flex:none;width:20mm;display:flex;flex-direction:column;align-items:center}
 .kt .kp{width:20mm;height:30mm;flex:none;background:#fff;border-radius:.7mm;box-shadow:0 0 0 .35mm #fed403;display:flex;align-items:center;justify-content:center;text-align:center;color:#b3bccd;font:700 5pt/1.5 Arial,Helvetica,sans-serif;letter-spacing:.08em}
 .kt .kp i{font-style:normal}
-.kt .kta{margin-top:1.5mm;font-size:5.2pt;font-weight:700;letter-spacing:.08em;color:#fed403;white-space:nowrap}
+.kt .kta{margin-top:1.5mm;width:24mm;text-align:center;font-size:4.8pt;font-weight:700;letter-spacing:.02em;color:#fed403;white-space:nowrap}
 .kt .kd{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:1mm;height:30mm}
-.kt .kv{display:flex;align-items:baseline;gap:1.5mm;min-width:0}
-.kt .kv small{flex:none;width:11.5mm;font-size:5pt;letter-spacing:.1em;text-transform:uppercase;color:#fed403;font-weight:700;line-height:1}
+.kt .kv{display:flex;align-items:baseline;gap:0;min-width:0}
+.kt .kv small{flex:none;width:10.6mm;font-size:5.6pt;letter-spacing:.02em;color:#fed403;font-weight:700;line-height:1}
+.kt .kv em{flex:none;width:2mm;font-style:normal;font-size:6pt;color:#fed403;font-weight:700;line-height:1}
 .kt .kv b{display:block;min-width:0;font-size:8.6pt;line-height:1.15;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kt .kn{padding:.9mm 0;border-top:.25mm solid rgba(255,255,255,.3);border-bottom:.25mm solid rgba(255,255,255,.3)}
-.kt .kn b.kname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:9.2pt;line-height:1.18;font-weight:700}
+.kt .kn b.kname{display:block;min-width:0;font-size:9pt;line-height:1.18;font-weight:700;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kt .kb{height:10mm;flex:none;margin-top:auto;background:#fff;border-radius:1.4mm;padding:1mm 2mm;display:flex;align-items:center;justify-content:center}
 .kt .kb svg{height:100%;width:auto;max-width:100%;max-height:100%}
 .kt .ks{position:absolute;left:0;right:0;bottom:0;height:1.8mm;background:linear-gradient(90deg,#fed403,#ffb305)}
@@ -1428,7 +1459,7 @@ ACT.rptExport = () => xl('Mengekspor laporan', () => {
 });
 ACT.rptPrint = async () => {
   const d = reportData();
-  await doPrint(`<div class="rp"><h2>${esc(S.set.namaAplikasi)} - ${esc(S.set.namaSekolah)}</h2><p>${esc(d.title)} \u2022 Tahun Ajaran ${esc(S.set.tahunAjaran)}</p><table><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${d.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`, d.title);
+  await doPrint(`<div class="rp"><h2>${esc(S.set.namaAplikasi)} - ${esc(S.set.namaSekolah)}</h2><p>${esc(d.title)} \u2022 Tahun Ajaran ${esc(taAktif())}</p><table><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${d.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`, d.title);
 };
 
 /* ============ PENGATURAN ============ */
@@ -1551,6 +1582,7 @@ SUB.login = async f => {
   const email = txt(f.email.value), pw = f.pw.value, btn = $('#lg-btn');
   loginErr('');
   if (!email || !pw) { loginErr('Isi email dan kata sandi.'); return; }
+  if (f.ta && TA_OPSI.includes(f.ta.value)) S.ta = f.ta.value;
   btn.disabled = true; btn.textContent = 'Memeriksa\u2026';
   try {
     if (IS_PREVIEW) await startApp(email);
@@ -1558,6 +1590,12 @@ SUB.login = async f => {
   } catch (e) { console.error(e); loginErr(loginMsg(e)); }
   btn.disabled = false; btn.textContent = 'Masuk';
 };
+CHG.loginTa = t => { if (TA_OPSI.includes(t.value)) { S.ta = t.value; applySettings(); } };
+function initTa() {
+  const sel = $('#lg-ta'); if (!sel) return;
+  sel.innerHTML = TA_OPSI.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>').join('');
+  sel.value = taSaatIni(); S.ta = sel.value;
+}
 let starting = false;
 async function startApp(email) {
   if (appOn || starting) return;
@@ -1602,7 +1640,7 @@ function setupPWA() {
 }
 
 /* ============ ANGGOTA GTK ============ */
-setupGtk({ S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal, confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom, blankText, saveWb, stamp });
+setupGtk({ namaKartu, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal, confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom, blankText, saveWb, stamp });
 
 /* ============ EVENT & BOOT ============ */
 function bindEvents() {
@@ -1624,7 +1662,7 @@ function bindEvents() {
 }
 (async function boot() {
   document.documentElement.style.overflow = 'hidden';
-  setupPWA(); hydrateIcons(); renderNav(); applySettings(); bindEvents();
+  setupPWA(); hydrateIcons(); renderNav(); initTa(); applySettings(); bindEvents();
   const showLogin = () => { $('#lib-boot').classList.add('off'); $('#lib-login').classList.add('on'); setTimeout(() => { const e = $('#lg-email'); if (e) e.focus(); }, 150); };
   if (IS_PREVIEW) { $('#lib-lpv').style.display = ''; showLogin(); return; }
   if (!FIREBASE_READY) { showLogin(); loginErr('Konfigurasi Firebase belum lengkap. Isi Environment Variables VITE_FIREBASE_* lalu deploy ulang.'); return; }

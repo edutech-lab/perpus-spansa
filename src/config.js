@@ -9,6 +9,14 @@ export const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 export const FIREBASE_READY = !!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+/* Pilihan tahun ajaran di halaman login. Tambahkan tahun berikutnya di sini. */
+export const TA_OPSI = ['2026/2027 Ganjil', '2026/2027 Genap'];
+/* Tahun ajaran saat ini: Juli-Desember = Ganjil, Januari-Juni = Genap. Jika tidak ada di daftar, pakai pilihan pertama. */
+export function taSaatIni(d = new Date()) {
+  const y = d.getFullYear(), m = d.getMonth() + 1;
+  const v = m >= 7 ? y + '/' + (y + 1) + ' Ganjil' : (y - 1) + '/' + y + ' Genap';
+  return TA_OPSI.includes(v) ? v : TA_OPSI[0];
+}
 export const LOGO = 'https://lh3.googleusercontent.com/d/1GDe6aqXyF_RR6kL3jMCy0vWqaO83jgyp';
 export const DEF_SET = {
   namaAplikasi: 'Aplikasi Perpustakaan',
