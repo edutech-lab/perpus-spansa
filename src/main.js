@@ -866,7 +866,7 @@ function kartuModal(ids) {
   openModal(`${mHead('Cetak Kartu Perpustakaan')}
 <form data-sub="kartuPrint" style="display:contents"><div class="mb">
  <div class="fld"><label>Anggota yang dicetak</label>${opts.map((o, i) => `<label class="chk"><input type="radio" name="src" value="${o[0]}" ${i === 0 ? 'checked' : ''}> ${o[1]} (${fmtNum(o[2])})</label>`).join('')}</div>
- <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm (sama dengan kartu pelajar), 10 kartu per lembar A4. Barcode berisi NIS. Pada kotak cetak browser aktifkan "Grafik latar belakang" dan skala 100%.</p>
+ <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm (sama dengan kartu pelajar), 10 kartu per lembar A4. Tersedia kotak putih 2 x 3 cm (20 x 30 mm) di sisi kiri untuk menempel pas foto. Kartu menampilkan NISN, nama, dan kelas; barcode berisi NIS (tanpa angka di bawahnya). Pada kotak cetak browser aktifkan "Grafik latar belakang", skala 100%, dan matikan "Header dan footer".</p>
 </div>
 <div class="mf"><button type="button" class="btn" data-act="closeModal">Batal</button><button class="btn warn" type="submit">${ic('print', 18)}Cetak Kartu</button></div></form>`);
 }
@@ -881,7 +881,7 @@ SUB.kartuPrint = async f => {
   if (!list.length) { toast('Tidak ada anggota untuk dicetak.', 'err'); return; }
   if (list.length > 1000) { toast('Maksimal 1.000 kartu sekali cetak. Cetak per kelas.', 'err'); return; }
   const logo = S.set.logoUrl || LOGO;
-  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><img src="${esc(logo)}" alt=""><div><b>${esc(S.set.namaSekolah)}</b><span>KARTU PERPUSTAKAAN</span></div></div><div class="kn"><b>${esc(a.nama)}</b><span>NIS ${esc(a.nis)}</span><span>Kelas ${esc(a.kelas)}</span></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="40" data-fs="12"></svg></div><div class="ks"></div></div>`).join('')}</div>`;
+  const html = `<div class="kt-grid">${list.map(a => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(S.set.tahunAjaran)}</div></div><div class="kd"><div class="kf"><small>Nama</small><b class="kname">${esc(a.nama)}</b></div><div class="kr"><div class="kf"><small>NISN</small><b>${esc(a.nisn || '-')}</b></div><div class="kf"><small>Kelas</small><b>${esc(a.kelas)}</b></div></div><div class="kb"><svg data-bc="${esc(a.nis)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
   closeModal();
   await doPrint(html, 'Kartu perpustakaan ' + fmtNum(list.length) + ' kartu');
 };
@@ -901,18 +901,29 @@ const PRINT_CSS = `*{box-sizing:border-box;-webkit-print-color-adjust:exact;prin
 .stk .rw span{font-size:7.5pt}
 .stk .rk{display:flex;align-items:center;justify-content:center;margin-top:.3mm;padding:.5mm 1.6mm;background:#000;color:#fff;border-radius:.8mm}
 .stk .rk b{font-size:9pt;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.kt-grid{display:grid;grid-template-columns:repeat(2,85.6mm);gap:3mm 5mm;justify-content:center}
-.kt{display:flex;flex-direction:column;width:85.6mm;height:54mm;border-radius:3mm;overflow:hidden;position:relative;color:#fff;background:linear-gradient(135deg,#0147ac 0%,#001455 100%);break-inside:avoid;page-break-inside:avoid;font-family:Arial,Helvetica,sans-serif}
-.kt .kh{display:flex;align-items:center;gap:2.5mm;padding:3mm 4mm 0}
-.kt .kh img{width:10mm;height:10mm;object-fit:contain}
-.kt .kh b{display:block;font-size:7.5pt;line-height:1.1}
-.kt .kh span{display:block;font-size:6pt;letter-spacing:.08em;color:#fed403;font-weight:700;margin-top:.6mm}
-.kt .kn{padding:2.2mm 4mm 0}
-.kt .kn b{display:block;font-size:10.5pt;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kt .kn span{display:block;font-size:7.5pt;line-height:1.4;opacity:.95}
-.kt .kb{flex:1;min-height:0;margin:2.4mm 4mm 3.8mm;background:#fff;border-radius:1.8mm;padding:1.4mm 2mm;display:flex;align-items:center;justify-content:center}
+.kt-grid{display:grid;grid-template-columns:repeat(2,85.6mm);gap:2mm 4mm;justify-content:center}
+.kt{width:85.6mm;height:54mm;border-radius:3mm;overflow:hidden;position:relative;color:#fff;background:radial-gradient(circle at 92% 108%,rgba(254,211,3,.20) 0,rgba(254,211,3,0) 38mm),linear-gradient(135deg,#0147ac 0%,#001455 100%);break-inside:avoid;page-break-inside:avoid;font-family:Arial,Helvetica,sans-serif}
+.kt .kh{position:absolute;left:0;right:0;top:0;height:12mm;display:flex;align-items:center;gap:2.6mm;padding:0 4mm;background:rgba(0,10,60,.38)}
+.kt .kl{flex:none;width:8.6mm;height:8.6mm;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 .35mm #fed403}
+.kt .kl img{width:7mm;height:7mm;object-fit:contain}
+.kt .kx{min-width:0}
+.kt .kx b{display:block;font-size:7.6pt;line-height:1.15;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt .kx span{display:block;font-size:5.6pt;letter-spacing:.13em;color:#fed403;font-weight:700;margin-top:.7mm}
+.kt .kg{position:absolute;left:0;right:0;top:12mm;height:.5mm;background:linear-gradient(90deg,#fed403,#ffb305)}
+.kt .kc{position:absolute;left:4mm;right:4mm;top:14.8mm;height:35.4mm;display:flex;gap:3.6mm}
+.kt .kfw{flex:none;width:20mm;display:flex;flex-direction:column;align-items:center}
+.kt .kp{width:20mm;height:30mm;flex:none;background:#fff;border-radius:.7mm;box-shadow:0 0 0 .35mm #fed403;display:flex;align-items:center;justify-content:center;text-align:center;color:#b3bccd;font:700 5pt/1.5 Arial,Helvetica,sans-serif;letter-spacing:.08em}
+.kt .kp i{font-style:normal}
+.kt .kta{margin-top:1.5mm;font-size:5.2pt;font-weight:700;letter-spacing:.08em;color:#fed403;white-space:nowrap}
+.kt .kd{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:1.5mm;height:30mm}
+.kt .kf small{display:block;font-size:4.8pt;letter-spacing:.14em;text-transform:uppercase;color:#fed403;font-weight:700;line-height:1;margin-bottom:.7mm}
+.kt .kf b{display:block;font-size:8.8pt;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt .kf b.kname{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:8.6pt;text-transform:uppercase;letter-spacing:.01em}
+.kt .kr{display:flex;gap:4mm;padding-top:1.4mm;border-top:.25mm solid rgba(255,255,255,.28)}
+.kt .kr .kf{min-width:0}
+.kt .kb{height:10.2mm;flex:none;margin-top:auto;background:#fff;border-radius:1.4mm;padding:1mm 2mm;display:flex;align-items:center;justify-content:center}
 .kt .kb svg{height:100%;width:auto;max-width:100%;max-height:100%}
-.kt .ks{position:absolute;left:0;right:0;bottom:0;height:1.6mm;background:linear-gradient(90deg,#fed403,#ffb305)}
+.kt .ks{position:absolute;left:0;right:0;bottom:0;height:1.8mm;background:linear-gradient(90deg,#fed403,#ffb305)}
 .rp{font:10pt Arial,Helvetica,sans-serif;color:#000}
 .rp h2{font-size:14pt;margin:0 0 2px}.rp p{margin:0 0 8px;color:#444;font-size:9pt}
 .rp table{width:100%;border-collapse:collapse;font-size:8.5pt}
@@ -928,7 +939,7 @@ async function doPrint(html, label) {
     const svgs = $$('svg[data-bc]', box);
     for (let i = 0; i < svgs.length; i++) {
       const s = svgs[i];
-      try { JsBarcode(s, s.dataset.bc, { format: 'CODE128', width: 1.6, height: +(s.dataset.h || 34), displayValue: true, fontSize: +(s.dataset.fs || 11), margin: 0, marginBottom: +(s.dataset.mb || 0), textMargin: 1 }); }
+      try { JsBarcode(s, s.dataset.bc, { format: 'CODE128', width: 1.6, height: +(s.dataset.h || 34), displayValue: !s.dataset.nt, fontSize: +(s.dataset.fs || 11), margin: 0, marginBottom: +(s.dataset.mb || 0), textMargin: 1 }); }
       catch (e) { const sp = document.createElement('span'); sp.textContent = s.dataset.bc; s.replaceWith(sp); }
       if (i % 20 === 19) { Prog.set(Math.round((i + 1) / svgs.length * 70), 'Membuat barcode ' + fmtNum(i + 1) + ' dari ' + fmtNum(svgs.length)); await sleep(0); }
     }

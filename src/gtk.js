@@ -126,7 +126,7 @@ export function setupGtk(c) {
     openModal(`${mHead('Cetak Kartu Perpustakaan GTK')}
 <form data-sub="gtkKartuPrint" style="display:contents"><div class="mb">
  <div class="fld"><label>Anggota yang dicetak</label>${opts.map((o, i) => `<label class="chk"><input type="radio" name="src" value="${o[0]}" ${i === 0 ? 'checked' : ''}> ${o[1]} (${fmtNum(o[2])})</label>`).join('')}</div>
- <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm, 10 kartu per lembar A4. Barcode berisi No. Anggota. Pada kotak cetak browser aktifkan "Grafik latar belakang" dan skala 100%.</p>
+ <p class="hint" style="margin-top:12px">Ukuran kartu 85,6 x 54 mm, 10 kartu per lembar A4, dengan kotak putih 2 x 3 cm untuk menempel pas foto. Kartu menampilkan NIP, nama, dan jenis PTK; barcode berisi No. Anggota (tanpa angka di bawahnya). Pada kotak cetak browser aktifkan "Grafik latar belakang" dan skala 100%.</p>
 </div>
 <div class="mf"><button type="button" class="btn" data-act="closeModal">Batal</button><button class="btn warn" type="submit">${ic('print', 18)}Cetak Kartu</button></div></form>`);
   }
@@ -141,7 +141,7 @@ export function setupGtk(c) {
     if (!list.length) { toast('Tidak ada anggota untuk dicetak.', 'err'); return; }
     if (list.length > 1000) { toast('Maksimal 1.000 kartu sekali cetak. Cetak per jenis PTK.', 'err'); return; }
     const logo = S.set.logoUrl || LOGO;
-    const html = `<div class="kt-grid">${list.map(g => `<div class="kt"><div class="kh"><img src="${esc(logo)}" alt=""><div><b>${esc(S.set.namaSekolah)}</b><span>KARTU PERPUSTAKAAN GTK</span></div></div><div class="kn"><b>${esc(g.nama)}</b><span>No. Anggota ${esc(g.noAnggota)}</span><span>${esc(g.jenisPtk)}</span></div><div class="kb"><svg data-bc="${esc(g.noAnggota)}" data-h="40" data-fs="12"></svg></div><div class="ks"></div></div>`).join('')}</div>`;
+    const html = `<div class="kt-grid">${list.map(g => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN GTK</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(S.set.tahunAjaran)}</div></div><div class="kd"><div class="kf"><small>Nama</small><b class="kname">${esc(g.nama)}</b></div><div class="kr"><div class="kf"><small>NIP</small><b>${esc(g.nip || '-')}</b></div><div class="kf"><small>Jenis PTK</small><b>${esc(g.jenisPtk)}</b></div></div><div class="kb"><svg data-bc="${esc(g.noAnggota)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
     closeModal();
     await doPrint(html, 'Kartu perpustakaan GTK ' + fmtNum(list.length) + ' kartu');
   };

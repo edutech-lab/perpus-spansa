@@ -1,6 +1,6 @@
 /* Service worker: hanya menyimpan aset statis milik sendiri (/assets, /icons).
    Data Firestore, autentikasi, dan permintaan lintas-domain TIDAK disimpan di cache. */
-const CACHE = 'perpus-v2';
+const CACHE = 'perpus-v3';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
