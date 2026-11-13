@@ -59,3 +59,10 @@
 #lib-deny>b:first-child{display:block;font-size:15px;color:#be123c;margin-bottom:6px}
 #lib-deny p{margin:6px 0}
 #lib-deny>div{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+
+/* Desktop: blok nama sekolah dirapatkan ke nama aplikasi (tidak menempel di tepi atas) */
+@media (min-width:901px){
+  .lgx-brand{justify-content:center;gap:0}
+  .lgx-top{margin-bottom:32px}
+  .lgx-brand>.lgx-bf{position:absolute;left:56px;bottom:32px}
+}
