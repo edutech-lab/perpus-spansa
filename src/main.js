@@ -940,7 +940,7 @@ const PRINT_CSS = `*{box-sizing:border-box;-webkit-print-color-adjust:exact;prin
 .kt .kx b{display:block;font-size:7.6pt;line-height:1.15;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kt .kx span{display:block;font-size:5.6pt;letter-spacing:.13em;color:#fed403;font-weight:700;margin-top:.7mm}
 .kt .kg{position:absolute;left:0;right:0;top:12mm;height:.5mm;background:linear-gradient(90deg,#fed403,#ffb305)}
-.kt .kc{position:absolute;left:4mm;right:4mm;top:14.8mm;height:35.4mm;display:flex;gap:3.6mm}
+.kt .kc{position:absolute;left:4mm;right:4mm;top:17mm;height:33mm;display:flex;gap:3.6mm}
 .kt .kfw{flex:none;width:20mm;display:flex;flex-direction:column;align-items:center}
 .kt .kp{width:20mm;height:30mm;flex:none;background:#fff;border-radius:.7mm;box-shadow:0 0 0 .35mm #fed403;display:flex;align-items:center;justify-content:center;text-align:center;color:#b3bccd;font:700 5pt/1.5 Arial,Helvetica,sans-serif;letter-spacing:.08em}
 .kt .kp i{font-style:normal}
