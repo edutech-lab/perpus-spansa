@@ -120,6 +120,35 @@ const S = { set: { ...DEF_SET }, anggota: [], gtk: [], gtkV: [], buku: [], pinja
 /* Tahun ajaran aktif = pilihan di halaman login. Cadangan: nilai pada Pengaturan, lalu tahun ajaran saat ini. */
 const taAktif = () => S.ta || S.set.tahunAjaran || taSaatIni();
 
+/* Nama GTK pada kartu: 1 baris. Jika terlalu panjang, nama belakang yang tidak cukup dibuang (tidak disingkat),
+   sedangkan gelar tetap ditulis di belakangnya. Contoh: Dra. Siti Nurhaliza Binti Abdul Rahman, M.Pd. -> Dra. Siti Nurhaliza, M.Pd. */
+const GELAR_DEPAN = /^(prof|dr|drs|dra|ir|h|hj|drg|apt|ns)\.?$/i;
+const GELAR_BELAKANG = /^[A-Za-z]{1,4}\.[A-Za-z]{1,6}[A-Za-z.]*,?$/;
+const PARTIKEL_NAMA = /^(bin|binti|bte|ibnu|ibn|van|von|de|al|el|abu)$/i;
+function namaKartuGtk(nama) {
+  const full = String(nama == null ? '' : nama).replace(/\s+/g, ' ').trim();
+  if (!full) return '-';
+  if (!ktCtx) ktCtx = document.createElement('canvas').getContext('2d');
+  const px = KT_NAMA_PT * 96 / 72, maxW = KT_NAMA_MM * 96 / 25.4 * 0.96;
+  ktCtx.font = '700 ' + px + 'px Arial, Helvetica, sans-serif';
+  const w = t => ktCtx.measureText(t).width + t.length * px * 0.01;
+  if (w(full) <= maxW) return full;
+  let main = full, suffix = '';
+  const ci = full.indexOf(',');
+  if (ci > 0) { main = full.slice(0, ci).trim(); suffix = full.slice(ci); }
+  else {
+    const tk = full.split(' '); let k = tk.length;
+    while (k > 1 && GELAR_BELAKANG.test(tk[k - 1])) k--;
+    if (k < tk.length) { main = tk.slice(0, k).join(' '); suffix = ' ' + tk.slice(k).join(' '); }
+  }
+  const words = main.split(' ');
+  let g = 0; while (g < words.length - 1 && GELAR_DEPAN.test(words[g])) g++;
+  const minKeep = g + 1;
+  while (words.length > minKeep && w(words.join(' ') + suffix) > maxW) words.pop();
+  while (words.length > minKeep && PARTIKEL_NAMA.test(words[words.length - 1])) words.pop();
+  return words.join(' ') + suffix;
+}
+
 /* Nama pada kartu selalu 1 baris. Jika terlalu panjang, kata setelah kata pertama disingkat menjadi inisial,
    dimulai dari kata paling belakang. Contoh: Muhammad Rizky Pratama Putra -> Muhammad Rizky Pratama P. */
 const KT_NAMA_MM = 39.5, KT_NAMA_PT = 9;
@@ -1769,7 +1798,7 @@ function setupPWA() {
 }
 
 /* ============ ANGGOTA GTK ============ */
-setupGtk({ ENT, namaKartu, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal, confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom, blankText, saveWb, stamp });
+setupGtk({ ENT, namaKartu, namaKartuGtk, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal, confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom, blankText, saveWb, stamp });
 
 /* ============ EVENT & BOOT ============ */
 function bindEvents() {

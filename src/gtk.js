@@ -4,7 +4,7 @@
 import * as XLSX from 'xlsx';
 
 export function setupGtk(c) {
-  const { ENT, namaKartu, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal,
+  const { ENT, namaKartu, namaKartuGtk, taAktif, S, Q, SEL, views, ACT, INP, CHG, SUB, PER, $, esc, txt, norm, ic, natSort, emptyHtml, pagerHtml, mHead, openModal, closeModal,
     confirmBox, toast, withProg, quick, commit, actOp, activeOf, fmtNum, validKode, doPrint, LOGO, openImport, needXlsx, xl, sheetFrom,
     blankText, saveWb, stamp } = c;
   const JENIS = ['Guru', 'Tendik'];
@@ -155,7 +155,7 @@ export function setupGtk(c) {
     if (!list.length) { toast('Tidak ada anggota untuk dicetak.', 'err'); return; }
     if (list.length > 1000) { toast('Maksimal 1.000 kartu sekali cetak. Cetak per jenis PTK.', 'err'); return; }
     const logo = S.set.logoUrl || LOGO;
-    const html = `<div class="kt-grid">${list.map(g => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN GTK</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(taAktif())}</div></div><div class="kd"><div class="kf kv"><small>NIP</small><em>:</em><b>${esc(g.nip || '-')}</b></div><div class="kn kv"><small>Nama</small><em>:</em><b class="kname">${esc(namaKartu(g.nama))}</b></div><div class="kf kv"><small>Jenis PTK</small><em>:</em><b>${esc(g.jenisPtk)}</b></div><div class="kb"><svg data-bc="${esc(g.noAnggota)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
+    const html = `<div class="kt-grid">${list.map(g => `<div class="kt"><div class="kh"><span class="kl"><img src="${esc(logo)}" alt=""></span><div class="kx"><b>${esc(S.set.namaSekolah)}</b><span>KARTU ANGGOTA PERPUSTAKAAN GTK</span></div></div><div class="kg"></div><div class="kc"><div class="kfw"><div class="kp"><i>TEMPEL<br>FOTO<br>2 x 3 cm</i></div><div class="kta">TA ${esc(taAktif())}</div></div><div class="kd"><div class="kf kv"><small>NIP</small><em>:</em><b>${esc(g.nip || '-')}</b></div><div class="kn kv"><small>Nama</small><em>:</em><b class="kname">${esc(namaKartuGtk(g.nama))}</b></div><div class="kf kv"><small>Jenis PTK</small><em>:</em><b>${esc(g.jenisPtk)}</b></div><div class="kb"><svg data-bc="${esc(g.noAnggota)}" data-h="30" data-nt="1"></svg></div></div></div><div class="ks"></div></div>`).join('')}</div>`;
     closeModal();
     await doPrint(html, 'Kartu perpustakaan GTK ' + fmtNum(list.length) + ' kartu');
   };

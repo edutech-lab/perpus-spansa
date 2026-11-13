@@ -31,3 +31,4 @@ Koleksi Firestore baru: `anggota_gtk` (ID dokumen = No. Anggota) dengan field `n
 - Cetak Laporan memakai kop surat sekolah (`src/kop.js`, ubah teks/logo di file tersebut bila perlu).
 - Pengaturan > Backup & Restore Data: unduh seluruh data ke file `.json` dan pulihkan dari file backup (mode Gabungkan atau Ganti semua).
 - Tinggi footer aplikasi dikecilkan menjadi 42 px.
+- Kartu Anggota GTK: jika nama terlalu panjang, nama belakang yang tidak cukup dibuang (tidak disingkat) dan gelar tetap ditulis di belakang nama. Kartu siswa tetap memakai singkatan inisial.
