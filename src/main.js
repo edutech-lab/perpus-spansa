@@ -151,7 +151,7 @@ function namaKartuGtk(nama) {
 
 /* Nama pada kartu selalu 1 baris. Jika terlalu panjang, kata setelah kata pertama disingkat menjadi inisial,
    dimulai dari kata paling belakang. Contoh: Muhammad Rizky Pratama Putra -> Muhammad Rizky Pratama P. */
-const KT_NAMA_MM = 39.5, KT_NAMA_PT = 9;
+const KT_NAMA_MM = 39.5, KT_NAMA_PT = 8;
 let ktCtx = null;
 function namaKartu(nama) {
   const full = String(nama == null ? '' : nama).replace(/\s+/g, ' ').trim();
@@ -979,9 +979,9 @@ const PRINT_CSS = `*{box-sizing:border-box;-webkit-print-color-adjust:exact;prin
 .kt .kv{display:flex;align-items:baseline;gap:0;min-width:0}
 .kt .kv small{flex:none;width:10.6mm;font-size:5.6pt;letter-spacing:.02em;color:#fed403;font-weight:700;line-height:1}
 .kt .kv em{flex:none;width:2mm;font-style:normal;font-size:6pt;color:#fed403;font-weight:700;line-height:1}
-.kt .kv b{display:block;min-width:0;font-size:8.6pt;line-height:1.15;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt .kv b{display:block;min-width:0;font-size:7.6pt;line-height:1.15;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kt .kn{padding:.9mm 0;border-top:.25mm solid rgba(255,255,255,.3);border-bottom:.25mm solid rgba(255,255,255,.3)}
-.kt .kn b.kname{display:block;min-width:0;font-size:9pt;line-height:1.18;font-weight:700;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt .kn b.kname{display:block;min-width:0;font-size:8pt;line-height:1.18;font-weight:700;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kt .kb{height:10mm;flex:none;margin-top:auto;background:#fff;border-radius:1.4mm;padding:1mm 2mm;display:flex;align-items:center;justify-content:center}
 .kt .kb svg{height:100%;width:auto;max-width:100%;max-height:100%}
 .kt .ks{position:absolute;left:0;right:0;bottom:0;height:1.8mm;background:linear-gradient(90deg,#fed403,#ffb305)}
